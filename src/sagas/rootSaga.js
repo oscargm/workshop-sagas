@@ -1,5 +1,7 @@
 import * as effects from "redux-saga/effects";
+import { END, eventChannel } from "redux-saga";
 import * as constants from "../actions/constants";
+import io from "socket.io-client";
 
 function* processTaskTimeConsuming() {
   yield effects.delay(1000 + 1000 * Math.random());
@@ -39,7 +41,33 @@ function* processAll() {
   yield effects.all(effectsToRun);
 }
 
+function wsEmitter() {
+  return eventChannel(emitter => {
+    const socket = io("http://localhost:3001");
+    socket.on("disconnect", reason => {
+      emitter(END);
+      socket.close();
+    });
+    socket.on("message", event => emitter(event));
+    // The subscriber must return an unsubscribe function
+    return () => {
+      socket.close();
+    };
+  });
+}
+
+function* wsHandler() {
+  const wsChan = yield effects.call(wsEmitter);
+  while (true) {
+    const event = yield effects.take(wsChan);
+    if (event.type === "create") {
+      yield effects.put({ type: constants.TASK_CREATE, name: event.name });
+    }
+  }
+}
+
 export function* rootSaga() {
-  yield effects.takeEvery(constants.TASK_PROCESS, processTaskTimed);
   yield effects.takeEvery(constants.TASK_PROCESS_ALL, processAll);
+  yield effects.takeEvery(constants.TASK_PROCESS, processTask);
+  yield effects.fork(wsHandler);
 }
