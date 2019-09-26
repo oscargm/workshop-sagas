@@ -40,6 +40,11 @@ function* doProcessTask(action) {
       type: constants.TASK_PROCESS_ERROR,
       name: actionName
     });
+  } finally {
+    yield effects.put({
+      type: constants.TASK_PROCESS_RESET,
+      name: actionName
+    });
   }
 }
 
