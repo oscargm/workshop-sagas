@@ -40,23 +40,28 @@ function* doProcessTask(action) {
       type: constants.TASK_PROCESS_ERROR,
       name: actionName
     });
-  } finally {
-    if (yield effects.cancelled()) {
-      yield effects.put({
-        type: constants.TASK_PROCESS_RESET,
-        name: actionName
-      });
-    }
   }
 }
-
 function* processTaskTimed(action) {
-  yield effects.race({
+  console.log("processTaskTimed", action);
+  const res = yield effects.race({
     response: effects.call(doProcessTask, action),
+    cancelled: effects.take(constants.TASK_PROCESS_CANCEL_ALL),
     timeout: effects.delay(1500)
   });
+  if (res.cancelled) {
+    yield effects.put({
+      type: constants.TASK_PROCESS_RESET,
+      name: action.name
+    });
+  }
+  if (res.timeout) {
+    yield effects.put({
+      type: constants.TASK_PROCESS_ERROR,
+      name: action.name
+    });
+  }
 }
-
 export function* rootSaga() {
   console.log("hi from sagas");
 
