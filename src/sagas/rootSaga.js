@@ -41,10 +41,12 @@ function* doProcessTask(action) {
       name: actionName
     });
   } finally {
-    yield effects.put({
-      type: constants.TASK_PROCESS_ERROR,
-      name: actionName
-    });
+    if (yield effects.cancelled()) {
+      yield effects.put({
+        type: constants.TASK_PROCESS_RESET,
+        name: actionName
+      });
+    }
   }
 }
 
