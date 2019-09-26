@@ -50,14 +50,18 @@ function* doProcessTask(action) {
   }
 }
 
+function* processTaskTimed(action) {
+  yield effects.race({
+    response: effects.call(doProcessTask, action),
+    timeout: effects.delay(1500)
+  });
+}
+
 export function* rootSaga() {
   console.log("hi from sagas");
 
   //  Would be the same as:
-  while (true) {
-    const action = yield effects.take(constants.TASK_PROCESS);
-    yield effects.fork(doProcessTask, action);
-    yield effects.delay(800);
-  }
+  yield effects.takeEvery(constants.TASK_PROCESS, processTaskTimed);
+
   // yield effects.throttle(1000, constants.TASK_PROCESS_START, doProcessTask);
 }
