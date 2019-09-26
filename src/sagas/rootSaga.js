@@ -33,9 +33,10 @@ function* processAll() {
   const tasks = yield effects.select(state =>
     state.tasks.filter(task => task.status === constants.statuses.IDLE)
   );
-  for (let task of tasks) {
-    yield effects.fork(doProcessTask, task.name);
-  }
+  const effectsToRun = tasks.map(task =>
+    effects.fork(doProcessTask, task.name)
+  );
+  yield effects.all(effectsToRun);
 }
 
 export function* rootSaga() {
