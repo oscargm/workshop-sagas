@@ -54,9 +54,9 @@ export function* rootSaga() {
   // yield effects.fork(doProcessTask, action);
   // }
   //  TakeEvery doesn't needs a while true
-  // yield effects.takeEvery(constants.TASK_PROCESS, doProcessTask);
-  while (true) {
-    const action = yield effects.take(constants.TASK_PROCESS);
-    const saga = yield effects.fork(doProcessTask, action);
-  }
+  yield effects.takeEvery(constants.TASK_PROCESS, doProcessTask);
+  // while (true) {
+  //   const action = yield effects.take(constants.TASK_PROCESS);
+  //   const saga = yield effects.fork(doProcessTask, action);
+  // }
 }
