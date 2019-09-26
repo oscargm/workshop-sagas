@@ -64,9 +64,5 @@ function* processTaskTimed(action) {
 }
 export function* rootSaga() {
   console.log("hi from sagas");
-
-  //  Would be the same as:
   yield effects.takeEvery(constants.TASK_PROCESS, processTaskTimed);
-
-  // yield effects.throttle(1000, constants.TASK_PROCESS_START, doProcessTask);
 }
