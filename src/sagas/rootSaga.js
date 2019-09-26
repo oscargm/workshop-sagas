@@ -40,13 +40,6 @@ function* doProcessTask(action) {
       type: constants.TASK_PROCESS_ERROR,
       name: actionName
     });
-  } finally {
-    if (yield effects.cancelled()) {
-      yield effects.put({
-        type: constants.TASK_PROCESS_RESET,
-        name: actionName
-      });
-    }
   }
 }
 
@@ -65,7 +58,5 @@ export function* rootSaga() {
   while (true) {
     const action = yield effects.take(constants.TASK_PROCESS);
     const saga = yield effects.fork(doProcessTask, action);
-    yield effects.delay(500);
-    yield effects.cancel(saga);
   }
 }
