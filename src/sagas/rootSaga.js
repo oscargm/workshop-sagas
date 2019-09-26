@@ -45,16 +45,16 @@ function* doProcessTask(action) {
 
 export function* rootSaga() {
   console.log("hi from sagas");
-  while (true) {
-    const action = yield effects.take(constants.TASK_PROCESS);
-    yield effects.call(doProcessTask, action);
-  }
+  // while (true) {
+  //   const action = yield effects.take(constants.TASK_PROCESS);
+  //   yield effects.call(doProcessTask, action);
+  // }
   //  take + fork is the same as takeEvery but a while true is needed
   // const action = yield effects.take(constants.TASK_PROCESS);
   // yield effects.fork(doProcessTask, action);
   // }
   //  TakeEvery doesn't needs a while true
-  // yield effects.takeEvery(constants.TASK_PROCESS, doProcessTask);
+  yield effects.takeLeading(constants.TASK_PROCESS, doProcessTask);
   // while (true) {
   //   const action = yield effects.take(constants.TASK_PROCESS);
   //   const saga = yield effects.fork(doProcessTask, action);
