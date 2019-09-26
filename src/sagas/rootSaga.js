@@ -41,24 +41,23 @@ function* doProcessTask(action) {
       name: actionName
     });
   } finally {
-    yield effects.put({
-      type: constants.TASK_PROCESS_RESET,
-      name: actionName
-    });
+    if (yield effects.cancelled()) {
+      yield effects.put({
+        type: constants.TASK_PROCESS_RESET,
+        name: actionName
+      });
+    }
   }
 }
 
 export function* rootSaga() {
   console.log("hi from sagas");
-  //  Takelatest will change the action performed if any is running | doesn't needs a while true
-  //  would be something like
-  // let lastProcess;
-  // while (true) {
-  //   const action = yield effects.take(constants.TASK_PROCESS);
-  //   if (lastProcess) {
-  //     yield effects.cancel(lastProcess);
-  //   }
-  //   lastProcess = yield effects.fork(doProcessTask, action.name);
-  // }
-  yield effects.takeLatest(constants.TASK_PROCESS, doProcessTask);
+
+  //  Would be the same as:
+  while (true) {
+    const action = yield effects.take(constants.TASK_PROCESS);
+    yield effects.fork(doProcessTask, action);
+    yield effects.delay(800);
+  }
+  // yield effects.throttle(1000, constants.TASK_PROCESS_START, doProcessTask);
 }
