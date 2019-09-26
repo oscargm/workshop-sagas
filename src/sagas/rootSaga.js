@@ -45,6 +45,6 @@ function* doProcessTask(action) {
 
 export function* rootSaga() {
   console.log("hi from sagas");
-  //  TakeLeading blocks other executions until first is not finished | doesn't needs a while true
-  yield effects.takeLeading(constants.TASK_PROCESS, doProcessTask);
+  //  Takelatest will change the action performed if any is running | doesn't needs a while true
+  yield effects.takeLatest(constants.TASK_PROCESS, doProcessTask);
 }
