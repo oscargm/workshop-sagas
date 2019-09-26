@@ -51,5 +51,14 @@ function* doProcessTask(action) {
 export function* rootSaga() {
   console.log("hi from sagas");
   //  Takelatest will change the action performed if any is running | doesn't needs a while true
+  //  would be something like
+  // let lastProcess;
+  // while (true) {
+  //   const action = yield effects.take(constants.TASK_PROCESS);
+  //   if (lastProcess) {
+  //     yield effects.cancel(lastProcess);
+  //   }
+  //   lastProcess = yield effects.fork(doProcessTask, action.name);
+  // }
   yield effects.takeLatest(constants.TASK_PROCESS, doProcessTask);
 }
